@@ -1398,6 +1398,9 @@ export function issueService(db: Db) {
       if (data.status === "in_progress" && !data.assigneeAgentId && !data.assigneeUserId) {
         throw unprocessable("in_progress issues require an assignee");
       }
+      if (data.status === "blocked" && (blockedByIssueIds === undefined || blockedByIssueIds.length === 0)) {
+        throw unprocessable("Issues set to blocked status must have at least one blocker in blockedByIssueIds");
+      }
       return db.transaction(async (tx) => {
         const defaultCompanyGoal = await getDefaultCompanyGoal(tx, companyId);
         const projectGoalId = await getProjectDefaultGoalId(tx, companyId, issueData.projectId);
